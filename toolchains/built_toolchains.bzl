@@ -7,22 +7,22 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 load("@rules_foreign_cc//toolchains:cmake_versions.bzl", _CMAKE_SRCS = "CMAKE_SRCS")
 
-_ALL_CONTENT = """\
-filegroup(
-    name = "all_srcs",
-    srcs = glob(["**"]),
-    visibility = ["//visibility:public"],
-)
+_ALL_CONTENT = """\r
+filegroup(\r
+    name = "all_srcs",\r
+    srcs = glob(["**"]),\r
+    visibility = ["//visibility:public"],\r
+)\r
 """
 
-_MESON_BUILD_FILE_CONTENT = """\
-exports_files(["meson.py"])
-
-filegroup(
-    name = "runtime",
-    srcs = glob(["mesonbuild/**"]),
-    visibility = ["//visibility:public"],
-)
+_MESON_BUILD_FILE_CONTENT = """\\\r
+exports_files(["meson.py"])\r
+\r
+filegroup(\r
+    name = "runtime",\r
+    srcs = glob(["mesonbuild/**"]),\r
+    visibility = ["//visibility:public"],\r
+)\r
 """
 
 # buildifier: disable=unnamed-macro
@@ -234,8 +234,6 @@ def _pkgconfig_toolchain(version, register_toolchains):
         http_archive,
         name = "glib_dev",
         build_file_content = '''
-load("@rules_cc//cc:defs.bzl", "cc_library")
-
 cc_import(
     name = "glib_dev",
     hdrs = glob(["include/**"]),
