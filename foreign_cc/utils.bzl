@@ -44,18 +44,20 @@ def runnable_binary(name, binary, foreign_cc_target, match_binary_name = False, 
 
     wrapper_cmd = """
     sed s@EXECUTABLE@$(rlocationpath {name})@g $(location @rules_foreign_cc//foreign_cc/private:runnable_binary_wrapper.sh) > tmp
-    sed s@SH_BINARY_FILENAME@{sh_binary_filename}@g tmp > $@
+    cp tmp $@
     """
 
-    # Yeah this does not work on windows.
+    if hasattr(native, "package_relative_label"):
+        fg_label = native.package_relative_label(name + "_fg")
+    else:
+        # pre Bazel 6.1.0
+        fg_label = full_label(name + "_fg")
+
     native.genrule(
         name = name + "_wrapper",
         srcs = ["@rules_foreign_cc//foreign_cc/private:runnable_binary_wrapper.sh", name + "_fg"],
         outs = [name + "_wrapper.sh"],
-        cmd = select({
-            "@platforms//os:windows": "",
-            "//conditions:default": wrapper_cmd.format(name = full_label(name + "_fg"), sh_binary_filename = binary if match_binary_name else name),
-        }),
+        cmd = wrapper_cmd.format(name = fg_label),
         tags = tags + ["manual"],
     )
 
